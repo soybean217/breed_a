@@ -1,24 +1,51 @@
 <template>
   <div class="container">
-    <div class="indexTitleUser">用户：XXX </div>
+    <div class="indexTitleUser">用户：{{username}} </div>
     <div class="indexTitleStat">栏舍健康信息统计 </div>
     <div class="wrapEcharts">
       <div class="mainChart1">
         <mpvue-echarts :echarts="echarts" :onInit="onInit" canvasId="index-pie" />
       </div>
-      <div class="mainChart2">正常：{{normalRoomCount}} 间
-        <br/>报警：{{alarmRoomCount}} 间
-        <br/>离线：{{offlineRoomCount}} 间
-        <br/>
+      <div class="mainChart2">
+        <div class="statList"><span style="color:#53bd53">&#9635;</span> 正常：{{normalRoomCount}} 间</div>
+        <div class="statList"><span style="color:#f6d101">&#9635;</span> 报警：{{alarmRoomCount}} 间</div>
+        <div class="statList"><span style="color:#e53036">&#9635;</span> 离线：{{offlineRoomCount}} 间</div>
       </div>
-      <div class="mainChart3">3</div>
+      <div class="mainChart3">
+        <div class="bigFont">{{totalRoomCount}}</div>
+        <div class="circleBlue"></div>
+        <div class='normalFont'> &nbsp;栏舍合计</div>
+        <div class="bigFont">{{normalRate}}</div>
+        <div class="squareGreen">&#10004;</div>
+        <div class='normalFont'> &nbsp;正常比例</div>
+      </div>
     </div>
-    <div class="echarts-wrap">
+    <div class="indexTitleStat" style="height:10px;width:100%"></div>
+    <div class="column_box">
+      <div class="column_img"><img src="/static/images/alarm.png"></div>
+      <div class="columnTitle">昨日警报</div>
+      <div class="columnRightDetailWarn">{{remindCount['1']}}</div>
     </div>
-    <div class="divFull" v-if='alartCount' @click='goWarnRoomList'>
-      <span class="roomWarn">报警栏舍数量：{{alartCount}}</span>
+    <div class="border_bottom"></div>
+    <div class="column_box">
+      <div class="column_img"><img src="/static/images/calendar.png"></div>
+      <div class="columnTitle">日常事务</div>
+      <div class="columnRightDetailNormal">{{remindCount['2']}}</div>
+    </div>
+    <div class="border_bottom"></div>
+    <div class="column_box">
+      <div class="column_img"><img src="/static/images/device.png"></div>
+      <div class="columnTitle">设备到期</div>
+      <div class="columnRightDetailNormal">{{remindCount['3']}}</div>
+    </div>
+    <div class="border_bottom"></div>
+    <div class="column_box">
+      <div class="column_img"><img src="/static/images/switch.png"></div>
+      <div class="columnTitle">参数修改</div>
+      <div class="columnRightDetailNormal">{{remindCount['4']}}</div>
     </div>
     <!-- <div class="divB1"> -->
+    <!--
     <div @click="goWarnMsgList('1')" class="exception">昨日警报
       <br><span class="boldNumber">{{remindCount['1']}}</span></div>
     <div @click="goWarnMsgList('2')" class="exception">日常事务
@@ -27,6 +54,7 @@
       <br><span class="boldNumber">{{remindCount['3']}}</span></div>
     <div @click="goWarnMsgList('4')" class="exception">参数修改
       <br><span class="boldNumber">{{remindCount['4']}}</span></div>
+    -->
     <!-- </div> -->
   </div>
 </template>
@@ -35,6 +63,7 @@ import echarts from 'echarts'
 import mpvueEcharts from 'mpvue-echarts'
 import { getAlarmInfo, getRemindInfo, formatArray } from '@/utils/api'
 const WARN_GATEWAY_LIST = 'WARN_GATEWAY_LIST'
+const LAST_SUCCESS_LOGIN_INPUT = 'LAST_SUCCESS_LOGIN_INPUT'
 
 var chartPie = null;
 var option = {}
@@ -106,8 +135,11 @@ export default {
       alartCount: 0,
       needReload: false,
       normalRoomCount: 0,
+      normalRate: 0,
       offlineRoomCount: 0,
       alarmRoomCount: 0,
+      totalRoomCount: 0,
+      username: '',
     }
   },
   methods: {
@@ -142,10 +174,14 @@ export default {
       }
       this.alartCount = 0
       let data = await getAlarmInfo()
+      let cache = wx.getStorageSync(LAST_SUCCESS_LOGIN_INPUT)
+      this.username = cache.userName
       this.normalNumber = Number(data.Result.Alarm._attributes.rate.replace('%', '')).toFixed(0)
       this.offlineRoomCount = parseInt(data.Result.Alarm._attributes.offlineAmt)
       this.alarmRoomCount = parseInt(data.Result.Alarm._attributes.alarmAmt)
-      this.normalRoomCount = parseInt(data.Result.Alarm._attributes.shackAmt) - this.offlineRoomCount - this.alarmRoomCount
+      this.totalRoomCount = parseInt(data.Result.Alarm._attributes.shackAmt)
+      this.normalRoomCount = this.totalRoomCount - this.offlineRoomCount - this.alarmRoomCount
+      this.normalRate = Number(100 * this.normalRoomCount / parseInt(data.Result.Alarm._attributes.shackAmt)).toFixed(0) + '%'
       if (data.Result.Alarm.Id) {
         data.Result.Alarm.Id = formatArray(data.Result.Alarm.Id)
         this.alartCount = data.Result.Alarm.Id.length
@@ -161,17 +197,17 @@ export default {
       }
       // if (this.normalNumber > 0) {
       option.series[0].data = [{
-        value: this.alarmRoomCount,
+        value: this.offlineRoomCount,
         name: '',
       }, {
         value: this.normalRoomCount,
         name: '',
       }, {
-        value: this.offlineRoomCount,
+        value: this.alarmRoomCount,
         name: '',
       }]
       option.title = {
-        text: Number(100 * this.normalRoomCount / parseInt(data.Result.Alarm._attributes.shackAmt)).toFixed(0) + '%',
+        text: this.normalRate,
         // subtext: 'From ExcelHome',
         // sublink: 'http://e.weibo.com/1341556070/AhQXtjbqh',
         x: 'center',
@@ -265,9 +301,14 @@ export default {
   background-color: rgb(0, 162, 233);
 }
 
+.normalFont {
+  float: left;
+  font-size: 14px;
+}
+
 .mainChart1 {
   float: left;
-  width: 39%;
+  width: 44%;
   height: 200px;
 }
 
@@ -279,7 +320,24 @@ export default {
 
 .mainChart3 {
   float: left;
-  width: 30%;
+  width: 25%;
+  border-left: 1px solid #dfdfe0;
+  padding-left: 20rpx;
+  padding-bottom: 14px;
+}
+
+.bigFont {
+  clear: both;
+  white-space: nowrap;
+  text-align: left;
+  font-size: 28px;
+  font-weight: 700;
+  font-style: normal;
+  text-decoration: none;
+  font-family: 微软雅黑;
+  color: rgb(0, 0, 0);
+  padding-top: 15px;
+  padding-bottom: 8px;
 }
 
 .wrapEcharts {
@@ -324,6 +382,7 @@ export default {
   font-weight: bold;
 }
 
+
 .exception {
   width: 360rpx;
   float: left;
@@ -336,6 +395,24 @@ export default {
   background-color: #fff;
   border: 2px solid #ddd;
   border-radius: 25rpx;
+}
+
+.circleBlue {
+  float: left;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #007aff;
+}
+
+.squareGreen {
+  float: left;
+  width: 16px;
+  height: 16px;
+  background-color: #53bd53;
+  color: white;
+  padding-left: 4px;
+  padding-bottom: 2px;
 }
 
 .boldNumber {
@@ -354,11 +431,77 @@ export default {
   justify-content: center;
   box-sizing: border-box;
   padding-top: 0;
+  background-color: #f2f4f5;
+}
+
+.statList {
+  padding-top: 12px;
 }
 
 .echarts-wrap {
   width: 100%;
   height: 200px;
+}
+
+.column_box {
+  width: 100%;
+  height: 46px;
+  font-size: 14px;
+  line-height: 46px;
+  background-color: #fff;
+  padding-left: 4%;
+  padding-right: 4%;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.column_img {
+  float: left;
+  margin-top: 10px;
+  margin-right: 15px;
+}
+
+.columnTitle {
+  float: left;
+  width: 75%;
+}
+
+.columnRightDetailWarn {
+  padding-right: 30px;
+  white-space: nowrap;
+  text-align: left;
+  font-size: 18px;
+  font-weight: 700;
+  font-style: normal;
+  text-decoration: none;
+  font-family: 微软雅黑;
+  color: rgb(255, 0, 51);
+}
+
+.columnRightDetailNormal {
+  padding-right: 30px;
+  white-space: nowrap;
+  text-align: left;
+  font-size: 18px;
+  font-weight: 700;
+  font-style: normal;
+  text-decoration: none;
+  font-family: 微软雅黑;
+  color: rgb(0, 153, 0);
+}
+
+.column_img img {
+  width: 18px;
+  height: 18px;
+}
+
+.border_bottom {
+  clear: both;
+  background-color: #dfdfe0;
+  height: 1px;
+  width: 95%;
+  bottom: 0;
 }
 
 </style>

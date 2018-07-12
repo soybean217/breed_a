@@ -38,8 +38,8 @@ export default {
         {
           text: '设置',
           pagePath: 'pages/monitors/profile',
-          iconPath: 'static/images/profile.png',
-          selectedIconPath: 'static/images/profile-actived.png'
+          iconPath: 'static/images/config.png',
+          selectedIconPath: 'static/images/config_blue.png'
         }
       ]
     }
