@@ -21,25 +21,25 @@
       </div>
     </div>
     <div class="indexTitleStat" style="height:10px;width:100%"></div>
-    <div class="column_box">
+    <div class="column_box" @click="goWarnMsgList('1')">
       <div class="column_img"><img src="/static/images/alarm.png"></div>
       <div class="columnTitle">昨日警报</div>
       <div class="columnRightDetailWarn">{{remindCount['1']}}</div>
     </div>
     <div class="border_bottom"></div>
-    <div class="column_box">
+    <div class="column_box" @click="goWarnMsgList('2')">
       <div class="column_img"><img src="/static/images/calendar.png"></div>
       <div class="columnTitle">日常事务</div>
       <div class="columnRightDetailNormal">{{remindCount['2']}}</div>
     </div>
     <div class="border_bottom"></div>
-    <div class="column_box">
+    <div class="column_box" @click="goWarnMsgList('3')">
       <div class="column_img"><img src="/static/images/device.png"></div>
       <div class="columnTitle">设备到期</div>
       <div class="columnRightDetailNormal">{{remindCount['3']}}</div>
     </div>
     <div class="border_bottom"></div>
-    <div class="column_box">
+    <div class="column_box" @click="goWarnMsgList('4')">
       <div class="column_img"><img src="/static/images/switch.png"></div>
       <div class="columnTitle">参数修改</div>
       <div class="columnRightDetailNormal">{{remindCount['4']}}</div>
