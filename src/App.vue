@@ -82,4 +82,54 @@ body {}
   }
 }
 
+.border_bottom {
+  clear: both;
+  background-color: #dfdfe0;
+  height: 1px;
+  width: 95%;
+  bottom: 0;
+}
+
+.column_img img {
+  width: 18px;
+  height: 18px;
+}
+
+.column_box {
+  width: 100%;
+  height: 46px;
+  font-size: 14px;
+  line-height: 46px;
+  background-color: #fff;
+  padding-left: 4%;
+  padding-right: 4%;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.column_img {
+  float: left;
+  margin-top: 10px;
+  margin-right: 15px;
+}
+
+.columnTitle {
+  float: left;
+  width: 75%;
+}
+
+
+.columnRightDetailNormal {
+  padding-right: 30px;
+  white-space: nowrap;
+  text-align: left;
+  font-size: 18px;
+  font-weight: 700;
+  font-style: normal;
+  text-decoration: none;
+  font-family: 微软雅黑;
+  color: rgb(0, 153, 0);
+}
+
 </style>
