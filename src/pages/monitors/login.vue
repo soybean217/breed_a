@@ -1,7 +1,7 @@
 <template>
   <div class="container">
-    <div class="title"><img src="/static/images/breed/logo_wenshi.jpg" /></div>
-    <div class="title">小猪微助手</div>
+    <div class="title"><img src="/static/images/a/logo_wenshi.jpg" /></div>
+    <div class="title">温氏环控小管家</div>
     <input type="text" class="formControl" v-model="username" placeholder="用户名" />
     <input type="password" class="formControl" v-model="password" placeholder="密码" />
     <div class="empty"></div>

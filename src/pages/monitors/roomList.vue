@@ -1,12 +1,12 @@
 <template>
   <div class="container">
     <div class="wrap" v-for="(gateway,i1) in farmInfo.gateways" :key="gateway._attributes.Id" @click="toRoomDetail(gateway)">
-      <div class="left green" v-if="gateway.details && gateway.details[0] != '设备离线'">
-        <img class="imgLeft" src='/static/images/home_green.png'>
+      <div class="left online" v-if="gateway.details && gateway.details[0] != '设备离线'">
+        <img class="imgLeft" src='/static/images/a/room_device_blue.png'>
         <br>{{gateway._attributes.Name}}
       </div>
       <div class="left" v-else>
-        <img class="imgLeft" src='/static/images/home.png'>
+        <img class="imgLeft" src='/static/images/a/room_device_gray.png'>
         <br>{{gateway._attributes.Name}}
       </div>
       <div class="right">
@@ -100,8 +100,8 @@ export default {
 </script>
 <style scoped>
 .imgLeft {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 36px;
 }
 
 .left {
@@ -110,16 +110,25 @@ export default {
   text-align: center;
   float: left;
   padding: 15px 5px;
+  font-size: 12px;
+  font-weight: 400;
+  font-style: normal;
+  font-family: 微软雅黑;
 }
 
-.green {
-  color: #009944;
+.online {
+  color: #01a2e9;
 }
 
 .right {
   width: 50%;
   float: left;
   padding: 5px 10px;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: normal;
+  font-family: 微软雅黑;
+  color: rgb(0, 0, 0);
 }
 
 .wrap {

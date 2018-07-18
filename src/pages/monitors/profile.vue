@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="profileArea">
+    <!-- <div class="profileArea">
       <div class="lineArea" @click='goLogin'>
         <div class='lineLeft'>重新登录</div>
         <div class='lineRight'>></div>
@@ -13,6 +13,23 @@
         <div class='lineLeft'>注销</div>
         <div class='lineRight'>></div>
       </div>
+    </div> -->
+    <div class="column_box" @click='goLogin'>
+      <div class="column_img"><img src="/static/images/a/refresh.png"></div>
+      <div class="columnTitle">重新登录</div>
+      <div class="columnRightDetailNormal"><img class="arrowImg" src="/static/images/a/arrow_right.png"></div>
+    </div>
+    <div class="border_bottom"></div>
+    <div class="column_box" @click='goServerEdit'>
+      <div class="column_img"><img src="/static/images/a/server.png"></div>
+      <div class="columnTitle">设置服务器</div>
+      <div class="columnRightDetailNormal"><img class="arrowImg" src="/static/images/a/arrow_right.png"></div>
+    </div>
+    <div class="border_bottom"></div>
+    <div class="column_box" @click='logout'>
+      <div class="column_img"><img src="/static/images/a/logout.png"></div>
+      <div class="columnTitle">注销</div>
+      <div class="columnRightDetailNormal"><img class="arrowImg" src="/static/images/a/arrow_right.png"></div>
     </div>
     <!-- <a class="bigBtn" href="login">
       重新登录
@@ -87,13 +104,28 @@ body {
 
 
 .container {
-  height: 100%;
-  display: flex;
+  height: 100vh;
+  display: block;
+  /*
+  
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: 200rpx 0;
+  */
+  padding: 20rpx 0;
   box-sizing: border-box;
+  background-color: #f2f3f5;
+}
+
+
+.arrowImg {
+  padding-top: 3px;
+  width: 24px;
+  height: 24px;
+}
+
+.column_box {
+  padding-left: 20px;
 }
 
 </style>

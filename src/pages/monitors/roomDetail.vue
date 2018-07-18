@@ -1,17 +1,31 @@
 <template>
   <div class="container">
+    <div class="onlineWrap">
+      {{chartTitle}}
+      <div v-if="online" class="onlineDiv">
+        在线&nbsp;
+        <img class="onlineIcon" src='/static/images/a/signal_green.png'></div>
+      <div v-else>离线</div>
+    </div>
     <div class="echarts-wrap">
       <mpvue-echarts :echarts="echarts" :onInit="onInit" canvasId="detail-line" />
     </div>
-    <div class="divFull" v-if="status.alarm"><span class="roomWarn">报警：{{status.alarm}}</span></div>
-    <div class="addtionParasCss">
+    <div class="baseState">
+      <div class="baseStateCell">{{state.state}}</div>
+      <div class="baseStateVerticalLine"></div>
+      <div class="baseStateCell">{{state.wind}}</div>
+      <div class="baseStateVerticalLine"></div>
+      <div class="baseStateCell">{{state.dayCount}}</div>
+    </div>
+    <!-- <div class="divFull" v-if="status.alarm"><span class="roomWarn">报警：{{status.alarm}}</span></div> -->
+    <!-- <div class="addtionParasCss">
       <div class="status" v-for="(para,i2) in addtionParas" :key='i2'>
         {{para.title}}：<span class="colorGreen" v-bind:class="para.style">{{para.description}}</span>
       </div>
-    </div>
+    </div> -->
     <div class="monitors">
       <div class="monitor" v-bind:class="{ monitorSelected: detail.isSelected }" v-for="(detail,i1) in details" :key='i1' @click='selectMachine(detail)'>
-        <div class="dataTitle">{{detail.name}}</div>
+        <div :class="detail.backgroundStyle">{{detail.name}}</div>
         <!-- <div v-if="detail.icon" :style="'background:url('+detail.icon+');background-size: contain;'" class="imgIcon"> -->
         <div v-if="detail.icon" class="imgIconDiv">
           <img :src='detail.icon' class="imgIcon" />
@@ -19,6 +33,19 @@
           <span class="smallByIcon">{{detail.value}}</span>
         </div>
         <div v-else class="dataValue" v-bind:class="detail.style">{{detail.value}}</div>
+      </div>
+    </div>
+    <div class="lineWrap"></div>
+    <div class="controllersWrap">
+      <div class="styleController" v-bind:class="{ monitorSelected: detail.isSelected }" v-for="(detail,i1) in controllerDetails" :key='i1' @click='selectMachine(detail)'>
+        <!-- <div v-if="detail.icon" :style="'background:url('+detail.icon+');background-size: contain;'" class="imgIcon"> -->
+        <div v-if="detail.icon" class="imgIconDiv">
+          <img :src='detail.icon' class="imgIcon" />
+          <!-- <div class="desc">{{detail.value}}</div> -->
+          <span class="smallByIcon">{{detail.value}}</span>
+        </div>
+        <div v-else class="dataValue" v-bind:class="detail.style">{{detail.value}}</div>
+        <div class="styleControllerTitle">{{detail.name}}</div>
       </div>
     </div>
   </div>
@@ -52,7 +79,12 @@ function initChart(canvas, width, height) {
       bottom: '10%',
       data: ['温度']
     },
+    title: {
+      show: false
+    },
     grid: {
+      top: 20,
+      bottom: 40,
       containLabel: true
     },
     animation: false,
@@ -95,10 +127,14 @@ export default {
       echarts,
       onInit: initChart,
       details: [],
+      controllerDetails: [],
       status: {},
       selectedHour: '',
       timeType: 'hour',
-      addtionParas: []
+      addtionParas: [],
+      state: {},
+      online: true,
+      chartTitle: '小时数据'
     }
   },
   methods: {
@@ -109,6 +145,34 @@ export default {
         return 'colorWarn'
       } else {
         return ''
+      }
+    },
+    titleBackgroundColor(config) {
+      switch (config._attributes.Type) {
+        case 'TEMPERATURE':
+          return 'styleBlue'
+        case 'HUMIDITY':
+          return 'styleBlue'
+        case 'AMMONIA':
+          return 'styleBlue'
+        case 'BRIGHTENESS':
+          return 'styleBlue'
+        case 'DRINK':
+          return 'styleGreen'
+        case 'FORAGE':
+          return 'styleGreen'
+        case 'AMMETER':
+          return 'styleGreen'
+        case 'CO2':
+          return 'styleBlue'
+        case 'ANEMOMETER':
+          return 'styleBlue'
+        case 'PRESSURE':
+          return 'styleBlue'
+        case 'AIRFLOW':
+          return 'styleBlue'
+        default:
+          return 'styleRed'
       }
     },
     selectMachine(sensor) {
@@ -203,14 +267,18 @@ export default {
           }
         }
       }
+      // option.title = {
+      //   left: '50%',
+      //   text: '小时数据',
+      //   textAlign: 'center',
+      //   textStyle: {
+      //     fontSize: 16,
+      //   }
+      // }
       option.title = {
-        left: '50%',
-        text: '小时数据',
-        textAlign: 'center',
-        textStyle: {
-          fontSize: 16,
-        }
+        show: false
       }
+      this.chartTitle = '小时数据'
       // console.log('chartData', chartData)
       // option.legend.data = [sensor.name]
       chart.clear()
@@ -265,16 +333,15 @@ export default {
           }
         }
       }
-      // console.log('chartData', chartData)
-      // option.legend.data = [sensor.name]
-      option.title = {
-        left: '50%',
-        text: this.selectedHour + '点的分钟数据',
-        textAlign: 'center',
-        textStyle: {
-          fontSize: 16,
-        }
-      }
+      // option.title = {
+      //   left: '50%',
+      //   text: this.selectedHour + '点的分钟数据',
+      //   textAlign: 'center',
+      //   textStyle: {
+      //     fontSize: 16,
+      //   }
+      // }
+      this.chartTitle = this.selectedHour + '点的分钟数据'
       chart.clear()
       chart.setOption(option);
       this.timeType = 'minute'
@@ -311,6 +378,9 @@ export default {
         description: gw.Result.OnLine._text == 'Y' ? '在线' : '离线',
         style: gw.Result.OnLine._text != 'Y' ? 'colorError' : ''
       })
+      this.state.state = this.getRunModeText(gw.Result.RunMode._text)
+      this.state.wind = '通风：' + formatErrMsg(gw.Result.VLevel._text)
+      this.state.dayCount = '天龄：' + formatErrMsg(gw.Result.Days._text)
     },
     async getInitData() {
       let gatewayId = wx.getStorageSync(CURRENT_GATEWAY)
@@ -324,6 +394,8 @@ export default {
       console.log('gw', gw)
       this.procStatuts(gw)
       let details = []
+      let addParaDetails = []
+      let controllerDetails = []
       let addtionParas = []
       if (gw.Result.SensorDatas.Sensor) {
         gw.Result.SensorDatas.Sensor = formatArray(gw.Result.SensorDatas.Sensor)
@@ -337,7 +409,8 @@ export default {
                 'name': sensorConfig._attributes.Name,
                 config: sensorConfig,
                 'value': tmpText,
-                style: this.computeColorClass(tmpText)
+                style: this.computeColorClass(tmpText),
+                backgroundStyle: 'dataTitle ' + this.titleBackgroundColor(sensorConfig)
               })
               if (sensorConfig.Params && sensor.Params) {
                 sensorConfig.Params.Param = formatArray(sensorConfig.Params.Param)
@@ -351,6 +424,15 @@ export default {
                         description: tmpText,
                         style: this.computeColorClass(tmpText),
                         code: sc._attributes.Code
+                      })
+                      addParaDetails.push({
+                        isSelected: false,
+                        catalog: 'addtionPara',
+                        'name': sc._attributes.Name,
+                        config: sensorConfig,
+                        'value': tmpText,
+                        style: this.computeColorClass(tmpText),
+                        backgroundStyle: 'dataTitle stylePurple'
                       })
                       break;
                     }
@@ -367,7 +449,7 @@ export default {
         for (var item of gw.Result.ControllerDatas.Controller) {
           for (let config of cache.Controllers.Controller) {
             if (config._attributes.Id == item._attributes.Id) {
-              details.push({
+              controllerDetails.push({
                 isSelected: false,
                 catalog: 'controller',
                 'name': config._attributes.Name,
@@ -385,6 +467,8 @@ export default {
       })
       this.addtionParas = this.addtionParas.concat(addtionParas)
       this.details = this.sortDetails(details)
+      this.controllerDetails = this.sortDetails(controllerDetails)
+      this.details = this.details.concat(addParaDetails)
       if (Array.isArray(this.details) && this.details.length > 0) {
         this.selectMachine(this.details[0])
       }
@@ -413,7 +497,7 @@ export default {
       return result
     },
     getControlIcon({ config = {}, item = {} } = {}) {
-      let dictory = '/static/images/breed/'
+      let dictory = '/static/images/breed/a/'
       // if (item._attributes.Degree.length > 0 && item._attributes.Degree != '0') {
       //   return false
       // } else {
@@ -478,7 +562,7 @@ export default {
 
 .monitor {
   float: left;
-  width: 24%;
+  width: 186rpx;
   height: 60px;
   text-align: center;
   display: flex;
@@ -490,9 +574,8 @@ export default {
   background-color: #DBDBDB;
   */
   background-color: #fff;
-  border: 1px solid #f8f9fb;
-  border-radius: 25rpx;
-  box-shadow: 2px 2px 5px #000;
+  border-bottom: 1rpx solid #f2f4f5;
+  border-right: 1rpx solid #f2f4f5;
 }
 
 .addtionParasCss {
@@ -512,13 +595,13 @@ export default {
 }
 
 .imgIcon {
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
 }
 
 .imgIconDiv {
   width: 100%;
-  height: 40px;
+  height: 45px;
   float: left;
 }
 
@@ -552,6 +635,7 @@ export default {
   text-align: center;
   justify-content: center;
   align-items: center;
+  background-color: #fff;
 }
 
 .link {
@@ -561,14 +645,46 @@ export default {
 }
 
 .echarts-wrap {
-  width: 100%;
-  height: 300px;
+  width: 750rpx;
+  height: 375rpx;
+  background-color: #f2f4f5;
 }
 
 .dataTitle {
-  font-size: 14px;
-  width: 100%;
+  font-size: 10px;
+  font-weight: 400;
+  font-style: normal;
+  font-family: Arial;
+  color: rgb(255, 255, 255);
+  width: 80%;
+  padding: 2px 0;
+  height: 14px;
   text-align: center;
+  border-radius: 6px;
+}
+
+.styleControllerTitle {
+  font-size: 10px;
+  font-weight: 400;
+  font-style: normal;
+  font-family: 微软雅黑;
+  color: rgb(102, 102, 102);
+}
+
+.styleBlue {
+  background-color: #00a2e9;
+}
+
+.styleGreen {
+  background-color: #009933;
+}
+
+.styleRed {
+  background-color: #ff3300;
+}
+
+.stylePurple {
+  background-color: #ff00ff;
 }
 
 .container {
@@ -579,12 +695,19 @@ export default {
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  background-color: #f2f4f5;
 }
 
 .dataValue {
-  font-weight: bold;
+  padding-top: 10px;
   font-size: 16px;
-  color: #6E8B3D;
+  font-weight: 400;
+  font-style: normal;
+  text-decoration: none;
+  font-family: Arial;
+  color: rgb(0, 0, 0);
 }
 
 .colorGreen {
@@ -598,6 +721,79 @@ export default {
 
 .colorError {
   color: red
+}
+
+.onlineIcon {
+  padding: 0 2px;
+  width: 20px;
+  height: 20px;
+}
+
+.onlineDiv {
+  float: right;
+  padding: 2px 0;
+  font-size: 12px;
+  font-weight: 400;
+  font-style: normal;
+  font-family: 微软雅黑;
+  color: #00cc00;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.onlineWrap {
+  padding: 4px 0;
+  font-size: 14px;
+  width: 100%;
+  text-align: center;
+  background-color: #f2f4f5;
+}
+
+.baseState {
+  width: 95%;
+  height: 30px;
+  border-radius: 30px;
+  background-color: #828383;
+}
+
+.baseStateCell {
+  width: 33%;
+  height: 30px;
+  margin-top: 5px;
+  float: left;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: normal;
+  font-family: 微软雅黑;
+  color: rgb(247, 247, 247);
+}
+
+.baseStateVerticalLine {
+  width: 1rpx;
+  height: 30px;
+  float: left;
+  background-color: #aeb0af;
+}
+
+.lineWrap {
+  width: 100%;
+  height: 20px;
+  background-color: #f2f4f5;
+  border-bottom: 1px solid #bbb;
+}
+
+.styleController {
+  width: 125rpx;
+  float: left;
+  height: 60px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 30rpx 0;
 }
 
 </style>

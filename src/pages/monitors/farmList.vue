@@ -1,13 +1,16 @@
 <template>
   <div class="container">
+    <div class="farmMenu">
+      <div class="farmMenuNormal">最近访问</div>
+      <div class="farmMenuActive">全部</div>
+    </div>
     <div class="list" v-for="(f0,i0)  in parentLeave" :key='f0.id._text'>
-      <div @click='chooseFarm(f0)'>
-        <span class="symbol" v-if="f0.hasChild"><span v-if="f0.childShow">-</span><span v-else>+</span>&nbsp;</span>
+      <div @click='chooseFarm(f0)' class="level_1">
         {{f0.name._text}}
       </div>
       <div v-if="f0.childShow" class="list1" v-for="(f1,i1) in childMapList[f0.id._text] " :key='f1.id._text'>
-        <div @click='chooseFarm(f1)'>
-          <span class="symbol" v-if="f1.hasChild"><span v-if="f1.childShow">-</span><span v-else>+</span>&nbsp;</span>{{f1.name._text}}
+        <div @click='chooseFarm(f1)' class="level_2">
+          {{f1.name._text}}
         </div>
         <div v-if="f1.childShow" class="list1" v-for="f2 in childMapList[f1.id._text] " :key='f2.id._text'>
           <div @click='chooseFarm(f2)'><span v-if="f2.hasChild">
@@ -141,14 +144,41 @@ body {
 
 .container {
   height: 100%;
-  width: 90%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80rpx 0;
   box-sizing: border-box;
-  margin: 0 auto;
+  margin: 0;
+  padding: 0;
+}
+
+.farmMenu {
+  width: 100%;
+  background-color: #f2f4f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.farmMenuNormal {
+  float: left;
+  padding: 12px;
+  width: 49%;
+  text-align: center;
+  color: rgb(153, 153, 153);
+  border-bottom: 1rpx solid rgb(153, 153, 153);
+}
+
+.farmMenuActive {
+  float: left;
+  width: 49%;
+  padding: 12px;
+  text-align: center;
+  color: rgb(0, 162, 233);
+  border-bottom: 1rpx solid rgb(0, 162, 233);
 }
 
 .symbol {
@@ -160,9 +190,7 @@ body {
 .list {
   width: 100%;
   font-size: 40rpx;
-  padding-left: 60rpx;
-  padding-top: 15rpx;
-  padding-bottom: 10rpx;
+  padding: 0;
   background-color: #fff;
   border: 5rpx solid #f8f9fb;
   border-radius: 25rpx;
@@ -170,9 +198,28 @@ body {
 
 .list1 {
   width: 100%;
-  padding-left: 60rpx;
+  padding-left: 14px;
   padding-top: 15rpx;
   padding-bottom: 10rpx;
+  background-color: #f2f4f5;
+  font-size: 14px;
+  color: rgb(153, 153, 153);
+}
+
+.level_1 {
+  width: 100%;
+  padding: 4px 0;
+  font-size: 13px;
+  font-weight: 700;
+  font-style: normal;
+  font-family: 微软雅黑;
+  color: rgb(51, 51, 51);
+}
+
+.level_2 {
+  width: 100%;
+  padding: 10px 0;
+  border-bottom: 1rpx solid rgb(153, 153, 153);
 }
 
 </style>
