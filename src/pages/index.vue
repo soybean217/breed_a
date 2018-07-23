@@ -1,14 +1,18 @@
 <template>
   <div class="container">
-    <div class="indexTitleUser">用户：{{username}} </div>
+    <div class="indexTitleUser">
+      用户：{{username}}
+      <div class="userLogo"><i class="iconfont icon-yyyonghu2 iconStyleLogo"></i></div>
+    </div>
     <div class="indexTitleStat">栏舍健康信息统计 </div>
     <div class="wrapEcharts">
       <div class="mainChart1">
+        <div class="chartArea">健康情况分布</div>
         <mpvue-echarts :echarts="echarts" :onInit="onInit" canvasId="index-pie" />
       </div>
       <div class="mainChart2">
         <div class="statList"><span style="color:#53bd53">&#9635;</span> 正常：{{normalRoomCount}} 间</div>
-        <div class="statList"><span style="color:#f6d101">&#9635;</span> 报警：{{alarmRoomCount}} 间</div>
+        <div class="statList" @click='goWarnRoomList'><span style="color:#f6d101">&#9635;</span> 报警：{{alarmRoomCount}} 间</div>
         <div class="statList"><span style="color:#e53036">&#9635;</span> 离线：{{offlineRoomCount}} 间</div>
       </div>
       <div class="mainChart3">
@@ -85,7 +89,7 @@ function initChart(canvas, width, height) {
 
   option = {
     backgroundColor: '#84c1ff',
-    color: ['#e62c33', '#52be52', '#f7d200', '#67E0E3', '#91F2DE', '#FFDB5C', '#FF9F7F'],
+    color: ['#f2f4f5', '#e62c33', '#52be52', '#f7d200', '#67E0E3', '#91F2DE', '#FFDB5C', '#FF9F7F'],
     series: [{
       label: {
         show: false,
@@ -97,8 +101,8 @@ function initChart(canvas, width, height) {
         show: false
       },
       type: 'pie',
-      center: ['50%', '50%'],
-      radius: ['40%', '60%'],
+      center: ['50%', '45%'],
+      radius: ['50%', '70%'],
       data: [{
         value: 3,
         name: '正常',
@@ -106,13 +110,13 @@ function initChart(canvas, width, height) {
         value: 1,
         name: '异常',
       }],
-      itemStyle: {
-        emphasis: {
-          shadowBlur: 10,
-          shadowOffsetX: 0,
-          shadowColor: 'rgba(0, 2, 2, 0.3)'
-        }
-      }
+      // itemStyle: {
+      //   emphasis: {
+      //     shadowBlur: 10,
+      //     shadowOffsetX: 0,
+      //     shadowColor: 'rgba(0, 2, 2, 0.3)'
+      //   }
+      // }
     }]
   }
 
@@ -151,9 +155,11 @@ export default {
       }
     },
     goWarnRoomList() {
-      wx.navigateTo({
-        url: '/pages/monitors/warnRoomList'
-      })
+      if (this.alarmRoomCount > 0) {
+        wx.navigateTo({
+          url: '/pages/monitors/warnRoomList'
+        })
+      }
     },
     async getInitData() {
       let remindInfo = await getRemindInfo()
@@ -193,10 +199,16 @@ export default {
           wx.setStorageSync(WARN_GATEWAY_LIST, {
             data: { gateways: data.Result.Alarm.Id }
           })
+          console.log('WARN_GATEWAY_LIST', {
+            data: { gateways: data.Result.Alarm.Id }
+          })
         }
       }
       // if (this.normalNumber > 0) {
       option.series[0].data = [{
+        value: 0,
+        name: '',
+      }, {
         value: this.offlineRoomCount,
         name: '',
       }, {
@@ -206,19 +218,49 @@ export default {
         value: this.alarmRoomCount,
         name: '',
       }]
+      option.series[0].hoverAnimation = false
+      option.series[0].z = 1
+      // option.series[0].legendHoverLink = false
+      console.log('before')
+      option.series.push({
+        data: [{ value: 100 }],
+        radius: ['0%', '50%'],
+        type: "pie",
+        center: ['50%', '45%'],
+        label: {
+          show: false,
+          normal: {
+            fontSize: 14
+          }
+        },
+        labelLine: {
+          show: false
+        },
+        hoverAnimation: false,
+        z: 10,
+      })
+      console.log('after')
+      // option.series[1] = 
       option.title = {
         text: this.normalRate,
         // subtext: 'From ExcelHome',
         // sublink: 'http://e.weibo.com/1341556070/AhQXtjbqh',
         x: 'center',
-        y: 'center',
+        y: '38%',
         itemGap: 20,
         textStyle: {
           color: '#53bc53',
           fontFamily: '微软雅黑',
           fontSize: 14,
           fontWeight: 'bolder'
-        }
+        },
+        z: 20,
+      }
+      option.legend = {
+        show: false
+      }
+      option.grid = {
+        top: 0,
       }
       // option.graghic = {
       //   type: 'text',
@@ -243,8 +285,56 @@ export default {
       //   }]
       // }
       chartPie.clear()
+      // let option1 = {
+      //   // tooltip: {
+      //   //   trigger: 'item',
+      //   //   formatter: "{a} <br/>{b}: {c} ({d}%)"
+      //   // },
+      //   // legend: {
+      //   //   orient: 'vertical',
+      //   //   x: 'left',
+      //   //   data: ['直接访问', '邮件营销', '联盟广告', '视频广告', '搜索引擎']
+      //   // },
+      //   series: [{
+      //     name: '访问来源',
+      //     type: 'pie',
+      //     radius: ['50%', '70%'],
+      //     avoidLabelOverlap: false,
+      //     label: {
+      //       normal: {
+      //         show: false,
+      //         position: 'center'
+      //       },
+      //       emphasis: {
+      //         show: true,
+      //         textStyle: {
+      //           fontSize: '30',
+      //           fontWeight: 'bold'
+      //         }
+      //       }
+      //     },
+      //     labelLine: {
+      //       normal: {
+      //         show: false
+      //       }
+      //     },
+      //     data: [
+      //       { value: 335, name: '直接访问' },
+      //       { value: 310, name: '邮件营销' },
+      //       { value: 234, name: '联盟广告' },
+      //       { value: 135, name: '视频广告' },
+      //       { value: 1548, name: '搜索引擎' }
+      //     ]
+      //   }]
+      // };
+      console.log('begin draw', option)
       chartPie.setOption(option);
+      console.log('draw end')
+
       chartPie.off("mousedown")
+      chartPie.off("click")
+      console.log('draw end')
+      /*
       chartPie.on("mousedown", function(params) {
         console.log('mousedown', params)
         if (params.name.startsWith("异常")) {
@@ -253,7 +343,7 @@ export default {
           })
         }
       });
-      // this.drawChart()
+      */
     },
   },
   mounted() {
@@ -294,7 +384,13 @@ export default {
   top: 0px;
   width: 100%;
   color: white;
-  padding: 28px;
+  padding: 15px 28px;
+  display: flex;
+  /*
+  flex-direction: column;
+  */
+  align-items: center;
+  justify-content: space-between;
   font-size: 28px;
   box-sizing: border-box;
   border-radius: 0px;
@@ -303,24 +399,24 @@ export default {
 
 .normalFont {
   float: left;
-  font-size: 14px;
+  font-size: 11px;
 }
 
 .mainChart1 {
   float: left;
-  width: 44%;
+  width: 49%;
   height: 200px;
 }
 
 .mainChart2 {
   font-size: 14px;
   float: left;
-  width: 30%;
+  width: 27%;
 }
 
 .mainChart3 {
   float: left;
-  width: 25%;
+  width: 23%;
   border-left: 1px solid #dfdfe0;
   padding-left: 20rpx;
   padding-bottom: 14px;
@@ -337,7 +433,7 @@ export default {
   font-family: 微软雅黑;
   color: rgb(0, 0, 0);
   padding-top: 15px;
-  padding-bottom: 8px;
+  padding-bottom: 4px;
 }
 
 .wrapEcharts {
@@ -455,6 +551,39 @@ export default {
   text-decoration: none;
   font-family: 微软雅黑;
   color: rgb(255, 0, 51);
+}
+
+.userLogo {
+  float: right;
+  width: 59px;
+  height: 59px;
+  border-style: solid;
+  border-color: rgb(255, 255, 255);
+  border-width: 2px;
+  background-color: rgb(215, 215, 215);
+  border-radius: 50%;
+  box-sizing: border-box;
+  display: flex;
+  /*
+  flex-direction: column;
+  */
+  align-items: center;
+  justify-content: center;
+}
+
+.iconStyleLogo {
+  font-size: 45px;
+}
+
+.chartArea {
+  padding-top: 14px;
+  padding-left: 14px;
+  font-size: 11px;
+  font-weight: 400;
+  font-style: normal;
+  text-decoration: none;
+  font-family: 微软雅黑;
+  color: rgb(102, 102, 102);
 }
 
 </style>

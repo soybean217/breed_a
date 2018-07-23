@@ -8,7 +8,7 @@
     <span @click="login" class="bigBtn">登录</span>
     <br>
     <div class="modifyLink">
-      <a href='/pages/monitors/serverEdit'>修改服务器地址</a>
+      <!-- <a href='/pages/monitors/serverEdit'>修改服务器地址</a> -->
     </div>
   </div>
 </template>
@@ -91,7 +91,7 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: 200rpx 0;
+  padding: 100rpx 0;
   box-sizing: border-box;
 }
 

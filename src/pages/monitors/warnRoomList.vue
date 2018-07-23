@@ -1,12 +1,12 @@
 <template>
   <div class="container">
     <div class="wrap" v-for="(gateway,i1) in farmInfo.gateways" :key="gateway._attributes.Id" @click="toRoomDetail(gateway)">
-      <div class="left green" v-if="gateway.details && gateway.details[0] != '设备离线'">
-        <img class="imgLeft" src='/static/images/home_green.png'>
+      <div class="left online" v-if="gateway.details && gateway.details[0] != '设备离线'">
+        <img class="imgLeft" src='/static/images/a/room_device_red.png'>
         <br>{{gateway._attributes.Name}}
       </div>
       <div class="left" v-else>
-        <img class="imgLeft" src='/static/images/home.png'>
+        <img class="imgLeft" src='/static/images/a/room_device_gray.png'>
         <br>{{gateway._attributes.Name}}
       </div>
       <div class="right">
@@ -34,6 +34,7 @@ export default {
     },
     async getInitData() {
       let data = await getStorage(WARN_GATEWAY_LIST)
+      console.log('WARN_GATEWAY_LIST', data)
       this.farmInfo = data.data.data
       syncGatewaysConfig({ gateways: this.farmInfo.gateways })
       for (let gateway of this.farmInfo.gateways) {
@@ -90,8 +91,8 @@ export default {
 </script>
 <style scoped>
 .imgLeft {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 36px;
 }
 
 .left {
@@ -100,24 +101,47 @@ export default {
   text-align: center;
   float: left;
   padding: 15px 5px;
+  font-size: 12px;
+  font-weight: 400;
+  font-style: normal;
+  font-family: 微软雅黑;
+}
+
+.online {
+  color: red;
 }
 
 .right {
   width: 50%;
   float: left;
   padding: 5px 10px;
-}
-
-.green {
-  color: #009944;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: normal;
+  font-family: 微软雅黑;
+  color: rgb(0, 0, 0);
 }
 
 .wrap {
   width: 100%;
-  border-bottom: 1px solid #bbb;
+  border-bottom: 10px solid #f2f4f5;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 5px;
+  background-color: #fff;
+}
+
+.container {
+  display: block;
+  height: 100vh;
+  /*
+  flex-direction: column;
+  */
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  background-color: #f2f4f5;
 }
 
 </style>

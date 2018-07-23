@@ -1,13 +1,5 @@
 <template>
   <div class="container">
-    <!-- <div class="wrap">
-      <div class="stat">合格率(%)
-        <br>0</div>
-      <div class="stat">总次数
-        <br>4</div>
-      <div class="stat">总时长
-        <br>21：20</div>
-    </div> -->
     <div class="searchWrap">
       <div class="search-top">
         <img class="imgSearch" src="/static/images/a/search_black.png">

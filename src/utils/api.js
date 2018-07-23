@@ -121,6 +121,7 @@ export async function gatewayDetail({ gatewayId = '' } = {}) {
   return data
 }
 export async function syncGatewaysConfig({ gateways = [] } = {}) {
+  console.log('syncGatewaysConfig', gateways)
   for (var gateway of gateways) {
     cacheGatewayConfig({ gateway: gateway })
   }
@@ -172,37 +173,45 @@ function _matchErrMsg(val) {
   }
 }
 
+export function formatSensorUnite(config = {}, val) {
+  return _formatSensorUnite(config, val)
+}
+
+function _formatSensorUnite(config = {}, val) {
+  switch (config._attributes.Type) {
+    case 'TEMPERATURE':
+      return val + ' ℃'
+    case 'HUMIDITY':
+      return val + ' %'
+    case 'AMMONIA':
+      return val + ' ppm'
+    case 'BRIGHTENESS':
+      return val + ' lx'
+    case 'DRINK':
+      return val + ' kg'
+    case 'FORAGE':
+      return val + ' kg'
+    case 'AMMETER':
+      return val + ' kw.h'
+    case 'CO2':
+      return val + ' ppm'
+    case 'ANEMOMETER':
+      return val + ' m/s'
+    case 'PRESSURE':
+      return val + ' pa'
+    case 'AIRFLOW':
+      return val + ' m3/h'
+    default:
+      return val
+  }
+}
+
 function _formatSensor({ config = {}, item = {} } = {}) {
   let val = parseInt(item._attributes.Val)
   if (val <= -600) {
     return _matchErrMsg(val)
   } else {
-    switch (config._attributes.Type) {
-      case 'TEMPERATURE':
-        return item._attributes.Val + ' ℃'
-      case 'HUMIDITY':
-        return item._attributes.Val + ' %'
-      case 'AMMONIA':
-        return item._attributes.Val + ' ppm'
-      case 'BRIGHTENESS':
-        return item._attributes.Val + ' lx'
-      case 'DRINK':
-        return item._attributes.Val + ' kg'
-      case 'FORAGE':
-        return item._attributes.Val + ' kg'
-      case 'AMMETER':
-        return item._attributes.Val + ' kw.h'
-      case 'CO2':
-        return item._attributes.Val + ' ppm'
-      case 'ANEMOMETER':
-        return item._attributes.Val + ' m/s'
-      case 'PRESSURE':
-        return item._attributes.Val + ' pa'
-      case 'AIRFLOW':
-        return item._attributes.Val + ' m3/h'
-      default:
-        return item._attributes.Val
-    }
+    return _formatSensorUnite(config, item._attributes.Val)
   }
 
   return item._attributes.Val
@@ -269,6 +278,7 @@ async function initGatewaysConfig() {
   console.log('initGatewaysConfig saved')
 }
 async function getGatewayConfig({ gatewayId = '' } = {}) {
+  console.log('gatewayId', gatewayId)
   let ticket = getLastSuccessTicket()
   let params = {}
   params.ticket = ticket.data.ticket

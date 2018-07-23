@@ -12,6 +12,7 @@ export default {
 
 </script>
 <style>
+@import './iconfont/iconfont.css';
 .container {
   /*
   height: 100vh;
@@ -129,7 +130,7 @@ body {}
   font-style: normal;
   text-decoration: none;
   font-family: 微软雅黑;
-  color: rgb(0, 153, 0);
+  color: #666666;
 }
 
 </style>

@@ -34,6 +34,11 @@ module.exports = [{
     navigationBarTitleText: '异常栏舍'
   }
 }, {
+  path: '/pages/monitors/recentRoomList',
+  config: {
+    navigationBarTitleText: '最近访问栏舍'
+  }
+}, {
   path: '/pages/monitors/roomDetail',
   config: {
     navigationBarTitleText: '栏舍详情'

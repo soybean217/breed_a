@@ -17,7 +17,7 @@
       <div class="baseStateVerticalLine"></div>
       <div class="baseStateCell">{{state.dayCount}}</div>
     </div>
-    <!-- <div class="divFull" v-if="status.alarm"><span class="roomWarn">报警：{{status.alarm}}</span></div> -->
+    <div class="divFull" v-if="status.alarm"><span class="roomWarn">报警：{{status.alarm}}</span></div>
     <!-- <div class="addtionParasCss">
       <div class="status" v-for="(para,i2) in addtionParas" :key='i2'>
         {{para.title}}：<span class="colorGreen" v-bind:class="para.style">{{para.description}}</span>
@@ -53,9 +53,11 @@
 <script>
 import echarts from 'echarts'
 import mpvueEcharts from 'mpvue-echarts'
-import { gatewayDetail, detailValueFormat, hourData, minData, formatErrMsg, formatArray } from '@/utils/api'
+import { gatewayDetail, detailValueFormat, hourData, minData, formatErrMsg, formatArray, formatSensorUnite } from '@/utils/api'
 const GATEWAY_CONFIG_PREFIX = 'GC_'
 const CURRENT_GATEWAY = 'CURRENT_GATEWAY'
+const RECENT_GATEWAYS = 'RECENT_GATEWAYS'
+const RECENT_LIMIT = 5
 
 var chart = null;
 var option = {}
@@ -193,6 +195,13 @@ export default {
           if (sensor.isSelected) {
             sensor.isSelected = !sensor.isSelected
             this.refreshDetails()
+          } else {
+            wx.showModal({
+              title: '提示',
+              content: '最多只能选择3个',
+              showCancel: false,
+              success: function(res) {}
+            })
           }
         }
       }
@@ -379,19 +388,20 @@ export default {
         style: gw.Result.OnLine._text != 'Y' ? 'colorError' : ''
       })
       this.state.state = this.getRunModeText(gw.Result.RunMode._text)
-      this.state.wind = '通风：' + formatErrMsg(gw.Result.VLevel._text)
+      // this.state.wind = '通风：' + formatErrMsg(gw.Result.VLevel._text)
+      this.state.wind = '通风：' + (parseInt(gw.Result.VLevel._text) >= 0 ? formatErrMsg(gw.Result.VLevel._text) : '---')
       this.state.dayCount = '天龄：' + formatErrMsg(gw.Result.Days._text)
     },
     async getInitData() {
       let gatewayId = wx.getStorageSync(CURRENT_GATEWAY)
       // console.log('getInitData', gatewayId)
       let cache = wx.getStorageSync(GATEWAY_CONFIG_PREFIX + '' + gatewayId)
-      console.log('gateway config cache', cache)
+      // console.log('gateway config cache', cache)
       wx.setNavigationBarTitle({
         title: cache._attributes.Name
       })
       let gw = await gatewayDetail({ gatewayId: gatewayId })
-      console.log('gw', gw)
+      // console.log('gw', gw)
       this.procStatuts(gw)
       let details = []
       let addParaDetails = []
@@ -419,6 +429,7 @@ export default {
                   for (let s of sensor.Params.Param) {
                     if (sc._attributes.Code == s._attributes.Id) {
                       let tmpText = s._attributes.Val ? s._attributes.Val : '---'
+                      tmpText = formatSensorUnite(sensorConfig, tmpText)
                       addtionParas.push({
                         title: sc._attributes.Name,
                         description: tmpText,
@@ -468,13 +479,47 @@ export default {
       this.addtionParas = this.addtionParas.concat(addtionParas)
       this.details = this.sortDetails(details)
       this.controllerDetails = this.sortDetails(controllerDetails)
-      this.details = this.details.concat(addParaDetails)
+      // this.details = this.details.concat(addParaDetails)
+      this.procAddParaToDetails(addParaDetails)
       if (Array.isArray(this.details) && this.details.length > 0) {
         this.selectMachine(this.details[0])
       }
       // let tmpAddtionParas = this.addtionParas
       // this.addtionParas = []
       // this.addtionParas = tmpAddtionParas
+      this.procRecentRoom(gatewayId)
+    },
+    procAddParaToDetails(addParaDetails) {
+      for (let i = 0; i < this.details.length; i++) {
+        for (let addPara of addParaDetails) {
+          if (this.details[i].config._attributes.Name == addPara.config._attributes.Name) {
+            this.details.splice(i + 1, 0, addPara)
+            i++
+          }
+        }
+      }
+    },
+    async procRecentRoom(lastId) {
+      let recentGateways = await wx.getStorageSync(RECENT_GATEWAYS)
+      if (recentGateways) {
+        // clear current gateway id 
+        for (let i = 0; i < recentGateways.data.gateways.length; i++) {
+          let gateway = recentGateways.data.gateways[i]
+          if (gateway._attributes.Id == lastId) {
+            recentGateways.data.gateways.splice(i, 1)
+            break;
+          }
+        }
+        recentGateways.data.gateways.unshift({ _attributes: { Id: lastId } })
+        if (recentGateways.data.gateways.length > RECENT_LIMIT) {
+          recentGateways.data.gateways.splice(RECENT_LIMIT, recentGateways.data.gateways.length - RECENT_LIMIT)
+        }
+      } else {
+        recentGateways = {
+          data: { gateways: [{ _attributes: { Id: lastId } }] }
+        }
+      }
+      wx.setStorageSync(RECENT_GATEWAYS, recentGateways)
     },
     sortDetails(oriDetails) {
       let result = []
@@ -544,7 +589,6 @@ export default {
     console.log('onUnload')
   },
   mounted() {
-    console.log('roomDetail mounted', getCurrentPages())
     this.getInitData()
   }
 }
@@ -785,7 +829,7 @@ export default {
 }
 
 .styleController {
-  width: 125rpx;
+  width: 150rpx;
   float: left;
   height: 60px;
   text-align: center;

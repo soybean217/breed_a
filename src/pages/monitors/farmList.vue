@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="farmMenu">
-      <div class="farmMenuNormal">最近访问</div>
+      <div class="farmMenuNormal" @click='goRecent'>最近访问</div>
       <div class="farmMenuActive">全部</div>
     </div>
     <div class="list" v-for="(f0,i0)  in parentLeave" :key='f0.id._text'>
@@ -11,6 +11,7 @@
       <div v-if="f0.childShow" class="list1" v-for="(f1,i1) in childMapList[f0.id._text] " :key='f1.id._text'>
         <div @click='chooseFarm(f1)' class="level_2">
           {{f1.name._text}}
+          <div class="arrow"><i class="iconfont icon-jiantouxia"></i></div>
         </div>
         <div v-if="f1.childShow" class="list1" v-for="f2 in childMapList[f1.id._text] " :key='f2.id._text'>
           <div @click='chooseFarm(f2)'><span v-if="f2.hasChild">
@@ -89,7 +90,11 @@ export default {
         url: '../board/main'
       })
     },
-
+    goRecent() {
+      wx.navigateTo({
+        url: '/pages/monitors/recentRoomList'
+      })
+    },
     async getInitData() {
       // let data = await userLogin({})
       let data = await farmList()
@@ -169,7 +174,7 @@ body {
   width: 49%;
   text-align: center;
   color: rgb(153, 153, 153);
-  border-bottom: 1rpx solid rgb(153, 153, 153);
+  border-bottom: 3px solid rgb(153, 153, 153);
 }
 
 .farmMenuActive {
@@ -178,7 +183,7 @@ body {
   padding: 12px;
   text-align: center;
   color: rgb(0, 162, 233);
-  border-bottom: 1rpx solid rgb(0, 162, 233);
+  border-bottom: 3px solid rgb(0, 162, 233);
 }
 
 .symbol {
@@ -201,15 +206,15 @@ body {
   padding-left: 14px;
   padding-top: 15rpx;
   padding-bottom: 10rpx;
-  background-color: #f2f4f5;
+  background-color: #E4E4E4;
   font-size: 14px;
   color: rgb(153, 153, 153);
 }
 
 .level_1 {
   width: 100%;
-  padding: 4px 0;
-  font-size: 13px;
+  padding: 4px 6px;
+  font-size: 16px;
   font-weight: 700;
   font-style: normal;
   font-family: 微软雅黑;
@@ -219,7 +224,13 @@ body {
 .level_2 {
   width: 100%;
   padding: 10px 0;
-  border-bottom: 1rpx solid rgb(153, 153, 153);
+  border-bottom: 1rpx solid #cccccc;
+}
+
+.arrow {
+  float: right;
+  padding-right: 40px;
+  font-size: 16px;
 }
 
 </style>
