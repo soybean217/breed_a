@@ -221,7 +221,6 @@ export default {
       option.series[0].hoverAnimation = false
       option.series[0].z = 1
       // option.series[0].legendHoverLink = false
-      console.log('before')
       option.series.push({
         data: [{ value: 100 }],
         radius: ['0%', '50%'],
@@ -239,7 +238,6 @@ export default {
         hoverAnimation: false,
         z: 10,
       })
-      console.log('after')
       // option.series[1] = 
       option.title = {
         text: this.normalRate,
@@ -262,78 +260,11 @@ export default {
       option.grid = {
         top: 0,
       }
-      // option.graghic = {
-      //   type: 'text',
-      //   left: 'center',
-      //   right: 'center',
-      //   z: 2,
-      //   zlevel: 100,
-      //   style: {
-      //     text: '100%',
-      //     x: 100,
-      //     y: 100,
-      //     textAlign: 'center',
-      //     fill: '#fff',
-      //     width: 30,
-      //     height: 30,
-      //   }
-      // }
-      // } else {
-      //   option.series[0].data = [{
-      //     value: 100,
-      //     name: '正常100%',
-      //   }]
-      // }
       chartPie.clear()
-      // let option1 = {
-      //   // tooltip: {
-      //   //   trigger: 'item',
-      //   //   formatter: "{a} <br/>{b}: {c} ({d}%)"
-      //   // },
-      //   // legend: {
-      //   //   orient: 'vertical',
-      //   //   x: 'left',
-      //   //   data: ['直接访问', '邮件营销', '联盟广告', '视频广告', '搜索引擎']
-      //   // },
-      //   series: [{
-      //     name: '访问来源',
-      //     type: 'pie',
-      //     radius: ['50%', '70%'],
-      //     avoidLabelOverlap: false,
-      //     label: {
-      //       normal: {
-      //         show: false,
-      //         position: 'center'
-      //       },
-      //       emphasis: {
-      //         show: true,
-      //         textStyle: {
-      //           fontSize: '30',
-      //           fontWeight: 'bold'
-      //         }
-      //       }
-      //     },
-      //     labelLine: {
-      //       normal: {
-      //         show: false
-      //       }
-      //     },
-      //     data: [
-      //       { value: 335, name: '直接访问' },
-      //       { value: 310, name: '邮件营销' },
-      //       { value: 234, name: '联盟广告' },
-      //       { value: 135, name: '视频广告' },
-      //       { value: 1548, name: '搜索引擎' }
-      //     ]
-      //   }]
-      // };
-      console.log('begin draw', option)
       chartPie.setOption(option);
-      console.log('draw end')
 
       chartPie.off("mousedown")
       chartPie.off("click")
-      console.log('draw end')
       /*
       chartPie.on("mousedown", function(params) {
         console.log('mousedown', params)

@@ -10,6 +10,7 @@
     <div class="echarts-wrap">
       <mpvue-echarts :echarts="echarts" :onInit="onInit" canvasId="detail-line" />
     </div>
+    <div class="divFull" v-if="status.alarm"><span class="roomWarn">报警：{{status.alarm}}</span></div>
     <div class="baseState">
       <div class="baseStateCell">{{state.state}}</div>
       <div class="baseStateVerticalLine"></div>
@@ -17,7 +18,6 @@
       <div class="baseStateVerticalLine"></div>
       <div class="baseStateCell">{{state.dayCount}}</div>
     </div>
-    <div class="divFull" v-if="status.alarm"><span class="roomWarn">报警：{{status.alarm}}</span></div>
     <!-- <div class="addtionParasCss">
       <div class="status" v-for="(para,i2) in addtionParas" :key='i2'>
         {{para.title}}：<span class="colorGreen" v-bind:class="para.style">{{para.description}}</span>
@@ -234,6 +234,29 @@ export default {
       }
       return JSON.parse(text)
     },
+    procMarkLine(sensor, chartData) {
+      let markLineOpt = {}
+      if (sensor.addPara) {
+        markLineOpt = {
+          animation: false,
+          lineStyle: {
+            normal: {
+              type: 'dotted'
+            }
+          },
+          data: [
+            [{
+              coord: [chartData.categories[0], sensor.addPara.oriValue],
+              symbol: 'none'
+            }, {
+              coord: [chartData.categories[chartData.categories.length - 1], sensor.addPara.oriValue],
+              symbol: 'none'
+            }]
+          ]
+        };
+      }
+      return markLineOpt
+    },
     async hourDataMachine() {
       option.legend.data = []
       option.series = []
@@ -243,13 +266,16 @@ export default {
           // console.log('hourDataMachine sensor', sensor)
           let data = await hourData({ machineId: sensor.config._attributes.Id })
           let chartData = this.procChartData(data.Result.Datas._text)
+          if (sensor.addPara) {
+            console.log('sensor if ', sensor.addPara)
+          }
           option.legend.data.push(sensor.name)
-
           option.series.push({
             name: sensor.name,
             type: 'line',
             smooth: true,
-            data: chartData.data
+            data: chartData.data,
+            markLine: this.procMarkLine(sensor, chartData)
           })
           if (needInitial) {
             option.xAxis = {
@@ -315,7 +341,8 @@ export default {
             name: sensor.name,
             type: 'line',
             smooth: true,
-            data: chartData.data
+            data: chartData.data,
+            markLine: this.procMarkLine(sensor, chartData)
           })
           if (needInitial) {
             option.xAxis = {
@@ -412,16 +439,7 @@ export default {
         for (let sensor of gw.Result.SensorDatas.Sensor) {
           for (let sensorConfig of cache.Sensors.Sensor) {
             if (sensorConfig._attributes.Id == sensor._attributes.Id) {
-              let tmpText = detailValueFormat({ config: sensorConfig, item: sensor, catalog: 'sensor' })
-              details.push({
-                isSelected: false,
-                catalog: 'sensor',
-                'name': sensorConfig._attributes.Name,
-                config: sensorConfig,
-                'value': tmpText,
-                style: this.computeColorClass(tmpText),
-                backgroundStyle: 'dataTitle ' + this.titleBackgroundColor(sensorConfig)
-              })
+              let addParaDetail = false
               if (sensorConfig.Params && sensor.Params) {
                 sensorConfig.Params.Param = formatArray(sensorConfig.Params.Param)
                 sensor.Params.Param = formatArray(sensor.Params.Param)
@@ -436,20 +454,33 @@ export default {
                         style: this.computeColorClass(tmpText),
                         code: sc._attributes.Code
                       })
-                      addParaDetails.push({
+                      addParaDetail = {
                         isSelected: false,
                         catalog: 'addtionPara',
                         'name': sc._attributes.Name,
                         config: sensorConfig,
                         'value': tmpText,
+                        oriValue: s._attributes.Val,
                         style: this.computeColorClass(tmpText),
                         backgroundStyle: 'dataTitle stylePurple'
-                      })
+                      }
+                      addParaDetails.push(addParaDetail)
                       break;
                     }
                   }
                 }
               }
+              let tmpText = detailValueFormat({ config: sensorConfig, item: sensor, catalog: 'sensor' })
+              details.push({
+                isSelected: false,
+                catalog: 'sensor',
+                'name': sensorConfig._attributes.Name,
+                config: sensorConfig,
+                'value': tmpText,
+                style: this.computeColorClass(tmpText),
+                backgroundStyle: 'dataTitle ' + this.titleBackgroundColor(sensorConfig),
+                addPara: addParaDetail,
+              })
               break
             }
           }
@@ -600,7 +631,6 @@ export default {
   text-align: center;
   font-size: 20px;
   font-weight: bold;
-  border-bottom: 1px solid #bbb;
 }
 
 
