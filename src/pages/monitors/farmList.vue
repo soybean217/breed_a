@@ -206,7 +206,7 @@ body {
   padding-left: 14px;
   padding-top: 15rpx;
   padding-bottom: 10rpx;
-  background-color: #E4E4E4;
+  background-color: #fff;
   font-size: 14px;
   color: rgb(153, 153, 153);
 }

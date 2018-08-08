@@ -55,7 +55,7 @@ export async function hourData({ machineId = '' } = {}) {
   let params = {}
   params.ticket = ticket.data.ticket
   params.machineid = machineId
-  let result = await (request.post(`/langrh/mobile/mobile!hourline.action`, json2Form(params)))
+  let result = await (request.post(`/mobile/mobile!hourline.action`, json2Form(params)))
   let data = JSON.parse(convert.xml2json(result, { compact: true }))
   checkResponse(data)
   return data
@@ -68,7 +68,7 @@ export async function minData({ machineId = '', hour = '' } = {}) {
   let cDate = new Date()
   params.searchhour = cDate.getFullYear() + '-' + fillZeroForMinute(cDate.getMonth() + 1) + '-' + fillZeroForMinute(cDate.getDate()) + ' ' + fillZeroForMinute(hour)
   // console.log('json2Form(params)', json2Form(params))
-  let result = await (request.post(`/langrh/mobile/mobile!minutesline.action`, json2Form(params)))
+  let result = await (request.post(`/mobile/mobile!minutesline.action`, json2Form(params)))
   let data = JSON.parse(convert.xml2json(result, { compact: true }))
   checkResponse(data)
   return data
@@ -85,7 +85,7 @@ export async function getAlarmInfo() {
   let ticket = getLastSuccessTicket()
   let params = {}
   params.paramStr = JSON.stringify({ ticket: ticket.data.ticket })
-  let result = await request.post(`/langrh/mobile/mobileGateway!getAlarmRate.action`, json2Form(params))
+  let result = await request.post(`/mobile/mobileGateway!getAlarmRate.action`, json2Form(params))
   console.log('getAlarmInfo', result)
   // result = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Result><ReturnFlag>0</ReturnFlag><ReturnMsg>success</ReturnMsg><Alarm shackAmt='47' alarmAmt='0' offlineAmt='24' rate='0.0%' offlineRate='48.93617%'></Alarm></Result>"
   let data = JSON.parse(convert.xml2json(result, { compact: true }))
@@ -97,7 +97,7 @@ export async function getRemindInfo() {
   let ticket = getLastSuccessTicket()
   let params = {}
   params.paramStr = JSON.stringify({ ticket: ticket.data.ticket })
-  let result = await request.post(`/langrh/mobile/mobileGateway!loadAllYestRemind.action`, json2Form(params))
+  let result = await request.post(`/mobile/mobileGateway!loadAllYestRemind.action`, json2Form(params))
   // result = result.replace(/<br\s*[\/]?>/gi, "")
   // console.log('getRemindInfo', result)
   let data = JSON.parse(convert.xml2json(result, { compact: true }))
@@ -248,7 +248,7 @@ async function getGatewayDetail({ gatewayId = '' } = {}) {
   let params = {}
   params.ticket = ticket.data.ticket
   params.gatewayid = gatewayId
-  let result = await (request.post(`/langrh/mobile/mobile!getShackStatusAndDatas.action`, json2Form(params)))
+  let result = await (request.post(`/mobile/mobile!getShackStatusAndDatas.action`, json2Form(params)))
   let data = JSON.parse(convert.xml2json(result, { compact: true }))
   // console.log('getGatewayDetail', data)
   return data
@@ -283,7 +283,7 @@ async function getGatewayConfig({ gatewayId = '' } = {}) {
   let params = {}
   params.ticket = ticket.data.ticket
   params.gatewayid = gatewayId
-  let result = await (request.post(`/langrh/mobile/mobile!config.action`, json2Form(params)))
+  let result = await (request.post(`/mobile/mobile!config.action`, json2Form(params)))
   let data = JSON.parse(convert.xml2json(result, { compact: true }))
   console.log('getGatewayConfig', data)
   try {
@@ -308,8 +308,8 @@ async function getFarmList() {
   let ticket = getLastSuccessTicket()
   let params = {}
   params.paramStr = JSON.stringify({ ticket: ticket.data.ticket })
-  // let result = await request.post(`/langrh/mobile/mobileFarm!loadFarms.action`, json2Form(params))
-  let result = await request.post(`/langrh/mobile/mobileFarm!loadFarms4Level.action`, json2Form(params))
+  // let result = await request.post(`/mobile/mobileFarm!loadFarms.action`, json2Form(params))
+  let result = await request.post(`/mobile/mobileFarm!loadFarms4Level.action`, json2Form(params))
   let data = JSON.parse(convert.xml2json(result, { compact: true }))
   console.log('farmList', data)
   return data
@@ -319,7 +319,7 @@ async function getGatewayList({ farmId = '' } = {}) {
   let params = {}
   console.log('getGatewayList', farmId)
   params.paramStr = JSON.stringify({ ticket: ticket.data.ticket, level: '3', nodeId: farmId })
-  let result = await (request.post(`/langrh/mobile/mobileGateway!loadGateway.action`, json2Form(params)))
+  let result = await (request.post(`/mobile/mobileGateway!loadGateway.action`, json2Form(params)))
   let data = JSON.parse(convert.xml2json(result, { compact: true }))
   console.log('getGatewayList', data)
   return data
@@ -366,7 +366,7 @@ async function login({ userName = '', password = '' } = {}) {
   // params.Password = password
   params.Password = md5(password)
   try {
-    let result = await request.post(`/langrh/mobile/mobile!login.action`, json2Form(params))
+    let result = await request.post(`/mobile/mobile!login.action`, json2Form(params))
     let data = JSON.parse(convert.xml2json(result, { compact: true }))
     if (data.Result.ReturnFlag._text == '0' && data.Result.ReturnMsg._text == "success") {
       await setStorage(LAST_SUCCESS_LOGIN_TICKET, {

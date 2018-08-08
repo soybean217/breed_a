@@ -266,9 +266,6 @@ export default {
           // console.log('hourDataMachine sensor', sensor)
           let data = await hourData({ machineId: sensor.config._attributes.Id })
           let chartData = this.procChartData(data.Result.Datas._text)
-          if (sensor.addPara) {
-            console.log('sensor if ', sensor.addPara)
-          }
           option.legend.data.push(sensor.name)
           option.series.push({
             name: sensor.name,
@@ -336,6 +333,7 @@ export default {
         if (sensor.isSelected) {
           let data = await minData({ machineId: sensor.config._attributes.Id, hour: this.selectedHour })
           let chartData = this.procChartData(data.Result.Datas._text)
+          console.log('chartData', chartData)
           option.legend.data.push(sensor.name)
           option.series.push({
             name: sensor.name,

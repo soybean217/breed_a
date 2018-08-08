@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title"><img src="/static/images/a/logo_wenshi.jpg" /></div>
+    <div class="title"><img src="/static/images/a/logo.png" /></div>
     <div class="title">温氏环控小管家</div>
     <input type="text" class="formControl" v-model="username" placeholder="用户名" />
     <input type="password" class="formControl" v-model="password" placeholder="密码" />
@@ -91,7 +91,7 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: 100rpx 0;
+  padding: 20rpx 0;
   box-sizing: border-box;
 }
 
@@ -118,8 +118,8 @@ export default {
 }
 
 .title img {
-  width: 240px;
-  height: 140px;
+  width: 100px;
+  height: 100px;
 }
 
 .modifyLink {
