@@ -41,6 +41,10 @@ export default {
         var cache = wx.getStorageSync(GATEWAY_CONFIG_PREFIX + gateway._attributes.Id)
         gateway._attributes.Name = cache._attributes.Name
         let gw = await gatewayDetail({ gatewayId: gateway._attributes.Id })
+        console.log('gw', gw)
+        if (gw.Result.Alarm) {
+          gateway.Alarm = gw.Result.Alarm
+        }
         if (gw.Result.OnLine._text == 'Y') {
           let tmpCount = 0
           for (let sensor of gw.Result.SensorDatas.Sensor) {

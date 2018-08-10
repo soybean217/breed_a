@@ -1,8 +1,9 @@
 <template>
   <div class="container">
     <div class="wrap" v-for="(gateway,i1) in farmInfo.gateways" :key="gateway._attributes.Id" @click="toRoomDetail(gateway)">
-      <div class="left online" v-if="gateway.details && gateway.details[0] != '设备离线'">
-        <img class="imgLeft" src='/static/images/a/room_device_blue.png'>
+      <div class="left online" v-bind:class="{ warnFontColor: gateway.Alarm }" v-if="gateway.details && gateway.details[0] != '设备离线'">
+        <img class="imgLeft" v-if="gateway.Alarm" src='/static/images/a/room_device_red.png'>
+        <img class="imgLeft" v-else src='/static/images/a/room_device_blue.png'>
         <br>{{gateway._attributes.Name}}
       </div>
       <div class="left" v-else>
@@ -43,6 +44,9 @@ export default {
         var cache = wx.getStorageSync(GATEWAY_CONFIG_PREFIX + gateway._attributes.Id)
         gateway._attributes.Name = cache._attributes.Name
         let gw = await gatewayDetail({ gatewayId: gateway._attributes.Id })
+        if (gw.Result.Alarm) {
+          gateway.Alarm = gw.Result.Alarm
+        }
         if (gw.Result.OnLine._text == 'Y') {
           let tmpCount = 0
           for (let sensor of gw.Result.SensorDatas.Sensor) {
@@ -76,6 +80,7 @@ export default {
           gateway.details = []
           gateway.details.push('设备离线')
         }
+        console.log('gateway', gateway)
 
         let tmpInfo = this.farmInfo
         this.farmInfo = {}
@@ -111,6 +116,10 @@ export default {
 
 .online {
   color: #01a2e9;
+}
+
+.warnFontColor {
+  color: red;
 }
 
 .right {
