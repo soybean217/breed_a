@@ -41,6 +41,10 @@ export function getWarnTypeNameById(typeId) {
   }
 }
 export function formatArray(target) {
+  return _formatArray(target)
+}
+
+function _formatArray(target) {
   if (Array.isArray(target)) {
     return target
   } else {
@@ -380,6 +384,7 @@ async function login({ userName = '', password = '' } = {}) {
       function asyncConfig(callback) {
         callback.call()
       }
+      data.Result.Gateways.Gateway = _formatArray(data.Result.Gateways.Gateway)
       asyncConfig(function() {
         console.log('data', data)
         for (var gateway of data.Result.Gateways.Gateway) {
