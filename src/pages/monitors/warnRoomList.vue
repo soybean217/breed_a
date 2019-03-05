@@ -4,6 +4,7 @@
       <div class="left online" v-if="gateway.details && gateway.details[0] != '设备离线'">
         <img class="imgLeft" src='/static/images/a/room_device_red.png'>
         <br>{{gateway._attributes.Name}}
+        <div v-if="gateway.Alarm" style="color:red">{{gateway.Alarm._text}}</div>
       </div>
       <div class="left" v-else>
         <img class="imgLeft" src='/static/images/a/room_device_gray.png'>
@@ -47,8 +48,20 @@ export default {
         }
         if (gw.Result.OnLine._text == 'Y') {
           let tmpCount = 0
+          if (gw.Result.Days._text) {
+            if (!gateway.details) {
+              gateway.details = []
+            }
+            gateway.details.push('天龄：' + Math.floor(gw.Result.Days._text))
+          }
+          if (gw.Result.Breed) {
+            if (!gateway.details) {
+              gateway.details = []
+            }
+            gateway.details.push('品种：' + gw.Result.Breed._text)
+          }
           for (let sensor of gw.Result.SensorDatas.Sensor) {
-            if (tmpCount >= DETAIL_LIMIT) {
+            if (gateway.details && gateway.details.length >= DETAIL_LIMIT) {
               break
             }
             // if (parseInt(sensor._attributes.Val) > -600) {

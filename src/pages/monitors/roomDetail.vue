@@ -5,50 +5,54 @@
       <div v-if="online" class="onlineDiv">
         在线&nbsp;
         <img class="onlineIcon" src='/static/images/a/signal_green.png'></div>
-      <div v-else>离线</div>
-    </div>
-    <div class="echarts-wrap">
-      <mpvue-echarts :echarts="echarts" :onInit="onInit" canvasId="detail-line" />
-    </div>
-    <div class="divFull" v-if="status.alarm"><span class="roomWarn">报警：{{status.alarm}}</span></div>
-    <div class="baseState">
-      <div class="baseStateCell">{{state.state}}</div>
-      <div class="baseStateVerticalLine"></div>
-      <div class="baseStateCell">{{state.wind}}</div>
-      <div class="baseStateVerticalLine"></div>
-      <div class="baseStateCell">{{state.dayCount}}</div>
-    </div>
-    <!-- <div class="addtionParasCss">
+        <div v-else>离线</div>
+      </div>
+      <div class="echarts-wrap">
+        <mpvue-echarts :echarts="echarts" :onInit="onInit" canvasId="detail-line" />
+      </div>
+      <div class="divFull" v-if="status.alarm"><span class="roomWarn">报警：{{status.alarm}}</span></div>
+      <div class="baseState">
+        <div class="baseStateCell">{{state.breed}}</div>
+        <div class="baseStateVerticalLine"></div>
+        <div class="baseStateCell">{{state.dayCount}}</div>
+      </div>
+      <div style="width:100%;height:1px"></div>
+      <div class="baseState">
+        <div class="baseStateCell">{{state.state}}</div>
+        <div class="baseStateVerticalLine"></div>
+        <div class="baseStateCell">{{state.wind}}</div>
+      </div>
+      <!-- <div class="addtionParasCss">
       <div class="status" v-for="(para,i2) in addtionParas" :key='i2'>
         {{para.title}}：<span class="colorGreen" v-bind:class="para.style">{{para.description}}</span>
       </div>
     </div> -->
-    <div class="monitors">
-      <div class="monitor" v-bind:class="{ monitorSelected: detail.isSelected }" v-for="(detail,i1) in details" :key='i1' @click='selectMachine(detail)'>
-        <div :class="detail.backgroundStyle">{{detail.name}}</div>
-        <!-- <div v-if="detail.icon" :style="'background:url('+detail.icon+');background-size: contain;'" class="imgIcon"> -->
-        <div v-if="detail.icon" class="imgIconDiv">
-          <img :src='detail.icon' class="imgIcon" />
-          <!-- <div class="desc">{{detail.value}}</div> -->
-          <span class="smallByIcon">{{detail.value}}</span>
+      <div class="monitors">
+        <div class="monitor" v-bind:class="{ monitorSelected: detail.isSelected }" v-for="(detail,i1) in details" :key='i1' @click='selectMachine(detail)'>
+          <div :class="detail.backgroundStyle">{{detail.name}}</div>
+          <!-- <div v-if="detail.icon" :style="'background:url('+detail.icon+');background-size: contain;'" class="imgIcon"> -->
+          <div v-if="detail.icon" class="imgIconDiv">
+            <img :src='detail.icon' class="imgIcon" />
+            <!-- <div class="desc">{{detail.value}}</div> -->
+            <span class="smallByIcon">{{detail.value}}</span>
+          </div>
+          <div v-else class="dataValue" v-bind:class="detail.style">{{detail.value}}</div>
         </div>
-        <div v-else class="dataValue" v-bind:class="detail.style">{{detail.value}}</div>
+      </div>
+      <div class="lineWrap"></div>
+      <div class="controllersWrap">
+        <div class="styleController" v-bind:class="{ monitorSelected: detail.isSelected }" v-for="(detail,i1) in controllerDetails" :key='i1' @click='selectMachine(detail)'>
+          <!-- <div v-if="detail.icon" :style="'background:url('+detail.icon+');background-size: contain;'" class="imgIcon"> -->
+          <div v-if="detail.icon" class="imgIconDiv">
+            <img :src='detail.icon' class="imgIcon" />
+            <!-- <div class="desc">{{detail.value}}</div> -->
+            <span class="smallByIcon">{{detail.value}}</span>
+          </div>
+          <div v-else class="dataValue" v-bind:class="detail.style">{{detail.value}}</div>
+          <div class="styleControllerTitle">{{detail.name}}</div>
+        </div>
       </div>
     </div>
-    <div class="lineWrap"></div>
-    <div class="controllersWrap">
-      <div class="styleController" v-bind:class="{ monitorSelected: detail.isSelected }" v-for="(detail,i1) in controllerDetails" :key='i1' @click='selectMachine(detail)'>
-        <!-- <div v-if="detail.icon" :style="'background:url('+detail.icon+');background-size: contain;'" class="imgIcon"> -->
-        <div v-if="detail.icon" class="imgIconDiv">
-          <img :src='detail.icon' class="imgIcon" />
-          <!-- <div class="desc">{{detail.value}}</div> -->
-          <span class="smallByIcon">{{detail.value}}</span>
-        </div>
-        <div v-else class="dataValue" v-bind:class="detail.style">{{detail.value}}</div>
-        <div class="styleControllerTitle">{{detail.name}}</div>
-      </div>
-    </div>
-  </div>
 </template>
 <script>
 import echarts from 'echarts'
@@ -413,6 +417,7 @@ export default {
         style: gw.Result.OnLine._text != 'Y' ? 'colorError' : ''
       })
       this.state.state = this.getRunModeText(gw.Result.RunMode._text)
+      this.state.breed = '品种：' + gw.Result.Breed._text
       // this.state.wind = '通风：' + formatErrMsg(gw.Result.VLevel._text)
       this.state.wind = '通风：' + (parseInt(gw.Result.VLevel._text) >= 0 ? formatErrMsg(gw.Result.VLevel._text) : '---')
       this.state.dayCount = '天龄：' + formatErrMsg(gw.Result.Days._text)
@@ -830,7 +835,7 @@ export default {
 }
 
 .baseStateCell {
-  width: 33%;
+  width: 49%;
   height: 30px;
   margin-top: 5px;
   float: left;
@@ -843,7 +848,7 @@ export default {
 }
 
 .baseStateVerticalLine {
-  width: 1rpx;
+  width: 1px;
   height: 30px;
   float: left;
   background-color: #aeb0af;

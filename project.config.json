@@ -7,10 +7,10 @@
 		"minified": true,
 		"newFeature": true
 	},
-	"miniprogramRoot": "./dist/",
+	"miniprogramRoot": "dist/",
 	"compileType": "miniprogram",
-	"appid": "wxbb8e61c5cdaaf8ba",
-	"projectname": "breed_a",
+	"appid": "wx21d74bc9168ab682",
+	"projectname": "bread_b",
 	"condition": {
 		"search": {
 			"current": -1,
